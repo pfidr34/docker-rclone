@@ -43,40 +43,41 @@ else
       d=$(date +%Y_%m_%d-%H_%M_%S)
       LOG_FILE="/logs/$d.txt"
       echo "INFO: Log file output to $LOG_FILE"
-      echo "INFO: Starting rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL --log-file=${LOG_FILE}"
+      echo "INFO: Starting rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
       set +e
-      eval "rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL --log-file=${LOG_FILE}"
+      eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
       export RETURN_CODE=$?
       set -e
     else
       echo "INFO: Starting rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL"
       set +e
-      eval "rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL"
+      eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
       export RETURN_CODE=$?
       set -e
     fi
   else
     set e+
-    if test "$(rclone --max-depth $RCLONE_DIR_CMD_DEPTH $RCLONE_DIR_CMD "$(eval echo $SYNC_SRC)" $RCLONE_OPTS)"; then
-    set e-
-    echo "INFO: Source directory is not empty and can be processed without clear loss of data"
-    if [ ! -z "$OUTPUT_LOG" ]
+    if test "$(rclone --max-depth $RCLONE_DIR_CMD_DEPTH $RCLONE_DIR_CMD "$(eval echo $SYNC_SRC)" $RCLONE_OPTS)";
     then
-      d=$(date +%Y_%m_%d-%H_%M_%S)
-      LOG_FILE="/logs/$d.txt"
-      echo "INFO: Log file output to $LOG_FILE"
-      echo "INFO: Starting rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL --log-file=${LOG_FILE}"
-      set +e
-      eval "rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL --log-file=${LOG_FILE}"
-      export RETURN_CODE=$?
-      set -e
-    else
-      echo "INFO: Starting rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL"
-      set +e
-      eval "rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL"
-      set -e
-      export RETURN_CODE=$?
-    fi
+      set e-
+      echo "INFO: Source directory is not empty and can be processed without clear loss of data"
+      if [ ! -z "$OUTPUT_LOG" ]
+      then
+        d=$(date +%Y_%m_%d-%H_%M_%S)
+        LOG_FILE="/logs/$d.txt"
+        echo "INFO: Log file output to $LOG_FILE"
+        echo "INFO: Starting rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
+        set +e
+        eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
+        set -e
+        export RETURN_CODE=$?
+      else
+        echo "INFO: Starting rclone $RCLONE_CMD '$SYNC_SRC' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
+        set +e
+        eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
+        set -e
+        export RETURN_CODE=$?
+      fi
     else
       echo "WARNING: Source directory is empty. Skipping $RCLONE_CMD command."
     fi
