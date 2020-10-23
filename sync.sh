@@ -97,7 +97,7 @@ else
       wget ${HEALTHCHECKS_IO_URL} -O /dev/null
     else
       echo "INFO: Sending failure signal to healthchecks.io"
-      wget ${HEALTHCHECKS_IO_FAIL_URL:-${HEALTHCHECKS_IO_URL:+${HEALTHCHECKS_IO_URL}/fail} -O /dev/null
+      wget ${HEALTHCHECKS_IO_FAIL_URL:-${HEALTHCHECKS_IO_URL:+${HEALTHCHECKS_IO_URL}/fail}} -O /dev/null
     fi
   fi
 
