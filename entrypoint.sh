@@ -9,13 +9,13 @@ echo "INFO: Running $(rclone --version | head -n 1)"
 if [[ ! ${RCLONE_CMD} =~ (copy|move|sync) ]]; then
   echo "WARNING: rclone command '${RCLONE_CMD}' is not supported by this container, please use sync/copy/move. Stopping."
   exit 1
-else if [[ ! ${RCLONE_DIR_CMD} =~ (ls|lsf) ]]; then
+elif [[ ! ${RCLONE_DIR_CMD} =~ (ls|lsf) ]]; then
   echo "WARNING: rclone directory command '${RCLONE_DIR_CMD}' is not supported by this container, please use ls/lsf. Stopping."
   exit 1
-else if [ -z "$GID" -a ! -z "$UID" ] || [ -z "$UID" -a ! -z "$GID" ]; then
+elif [ -z "$GID" -a ! -z "$UID" ] || [ -z "$UID" -a ! -z "$GID" ]; then
   echo "WARNING: Must supply both UID and GID or neither. Stopping."
   exit 1
-else if [ ! -z "$TZ" -a -f /usr/share/zoneinfo/$TZ ]; then
+elif [ ! -z "$TZ" -a -f /usr/share/zoneinfo/$TZ ]; then
   echo "WARNING: TZ was set '${TZ}', but corresponding zoneinfo file does not exist. Stopping."
   exit 1
 fi
