@@ -59,13 +59,7 @@ rm -f /tmp/sync.pid
 if [ -z "$SYNC_SRC" ]; then
   echo "INFO: No SYNC_SRC defined. Stopping"
   exit 1
-elif [ -z "$SYNC_DEST" ]; then
-  echo "INFO: No SYNC_DEST defined. Stopping"
-  exit 1
 else
-  # SYNC_SRC and SYNC_DEST setup
-  # run sync either once or in cron depending on CRON
-
   if [ -z "${SYNC_ON_STARTUP}" ]
   then
     echo "INFO: Add SYNC_ON_STARTUP=1 to perform a sync upon boot"

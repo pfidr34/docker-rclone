@@ -3,6 +3,8 @@
 
 set -e
 
+SYNC_DEST=/data
+
 echo "INFO: Starting sync.sh pid $$ $(date)"
 
 if [ `lsof | grep $0 | wc -l | tr -d ' '` -gt 1 ]
