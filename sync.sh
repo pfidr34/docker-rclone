@@ -89,7 +89,7 @@ else
   # Wrap up healthchecks.io call with complete or failure signal
   if [ -z "${HEALTHCHECKS_IO_URL}" ]
   then
-    echo "INFO: Define {HEALTHCHECKS_IO_URL} with https://healthchecks.io to monitor $RCLONE_CMD job"
+    echo "INFO: Define HEALTHCHECKS_IO_URL with https://healthchecks.io to monitor $RCLONE_CMD job"
   else
     if [ "$RETURN_CODE" == 0 ]
     then
@@ -97,7 +97,7 @@ else
       wget ${HEALTHCHECKS_IO_URL} -O /dev/null
     else
       echo "INFO: Sending failure signal to healthchecks.io"
-      wget ${HEALTHCHECKS_IO_FAIL_URL} -O /dev/null
+      wget ${HEALTHCHECKS_IO_FAIL_URL:-${HEALTHCHECKS_IO_URL:+${HEALTHCHECKS_IO_URL}/fail} -O /dev/null
     fi
   fi
 

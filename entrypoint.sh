@@ -67,25 +67,25 @@ else
     su "$USER" -c /sync.sh
   fi
 
+  # Re-write cron shortcut
+  case "$(echo "$CRON" | tr '[:lower:]' '[:upper:]')" in
+      *@YEARLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 1 1 *" && CRONS="0 0 1 1 *";;
+      *@ANNUALLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 1 1 *" && CRONS="0 0 1 1 *";;
+      *@MONTHLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 1 * *" && CRONS="0 0 1 * * ";;
+      *@WEEKLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 * * 0" && CRONS="0 0 * * 0";;
+      *@DAILY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 * * *" && CRONS="0 0 * * *";;
+      *@MIDNIGHT* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 * * *" && CRONS="0 0 * * *";;
+      *@HOURLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 * * * *" && CRONS="0 * * * *";;
+      *@* ) echo "WARNING: Cron shortcut $CRON is not supported. Stopping." && exit 1;;
+      * ) CRONS=$CRON;;
+  esac
+
   if [ -z "$CRONS" ]
   then
     echo "INFO: No CRON setting found. Stopping."
     echo "INFO: Add CRON=\"0 0 * * *\" to perform sync every midnight"
     exit 1
   else
-    # Re-write cron shortcut
-    case "$(echo "$CRON" | tr '[:lower:]' '[:upper:]')" in
-        *@YEARLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 1 1 *" && CRONS="0 0 1 1 *";;
-        *@ANNUALLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 1 1 *" && CRONS="0 0 1 1 *";;
-        *@MONTHLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 1 * *" && CRONS="0 0 1 * * ";;
-        *@WEEKLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 * * 0" && CRONS="0 0 * * 0";;
-        *@DAILY* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 * * *" && CRONS="0 0 * * *";;
-        *@MIDNIGHT* ) echo "INFO: Cron shortcut $CRON re-written to 0 0 * * *" && CRONS="0 0 * * *";;
-        *@HOURLY* ) echo "INFO: Cron shortcut $CRON re-written to 0 * * * *" && CRONS="0 * * * *";;
-        *@* ) echo "WARNING: Cron shortcut $CRON is not supported. Stopping." && exit 1;;
-        * ) CRONS=$CRON;;
-    esac
-
     # Setup cron schedule
     crontab -d
     echo "$CRONS su $USER -c /sync.sh >>/tmp/sync.log 2>&1" > /tmp/crontab.tmp
