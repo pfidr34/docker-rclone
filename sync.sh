@@ -10,10 +10,10 @@ then
 else
 
   # Signal start oh sync.sh to healthchecks.io
-  if [ ! -z "$CHECK_URL" ]
+  if [ ! -z "${HEALTHCHECKS_IO_URL}" ]
   then
     echo "INFO: Sending start signal to healthchecks.io"
-    wget $CHECK_URL/start -O /dev/null
+    wget ${HEALTHCHECKS_IO_URL}/start -O /dev/null
   fi
 
   # Delete logs by user request
@@ -84,17 +84,17 @@ else
   fi
 
   # Wrap up healthchecks.io call with complete or failure signal
-  if [ -z "$CHECK_URL" ]
+  if [ -z "${HEALTHCHECKS_IO_URL}" ]
   then
-    echo "INFO: Define CHECK_URL with https://healthchecks.io to monitor $RCLONE_CMD job"
+    echo "INFO: Define {HEALTHCHECKS_IO_URL} with https://healthchecks.io to monitor $RCLONE_CMD job"
   else
     if [ "$RETURN_CODE" == 0 ]
     then
       echo "INFO: Sending complete signal to healthchecks.io"
-      wget $CHECK_URL -O /dev/null
+      wget ${HEALTHCHECKS_IO_URL} -O /dev/null
     else
       echo "INFO: Sending failure signal to healthchecks.io"
-      wget $FAIL_URL -O /dev/null
+      wget ${HEALTHCHECKS_IO_FAIL_URL} -O /dev/null
     fi
   fi
 
