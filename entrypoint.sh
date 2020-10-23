@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 set -e
 
 # Announce version
@@ -15,7 +14,7 @@ elif [[ ! ${RCLONE_DIR_CMD} =~ (ls|lsf) ]]; then
 elif [ -z "$GID" -a ! -z "$UID" ] || [ -z "$UID" -a ! -z "$GID" ]; then
   echo "WARNING: Must supply both UID and GID or neither. Stopping."
   exit 1
-elif [ ! -z "$TZ" -a -f /usr/share/zoneinfo/$TZ ]; then
+elif [ ! -z "$TZ" -a ! -f /usr/share/zoneinfo/$TZ ]; then
   echo "WARNING: TZ was set '${TZ}', but corresponding zoneinfo file does not exist. Stopping."
   exit 1
 fi
