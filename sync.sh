@@ -1,5 +1,21 @@
 #!/bin/sh
 
+rclone_exec() {
+  CMD="rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
+
+  if [ ! -z "$OUTPUT_LOG" ]
+  then
+    d=$(date +%Y_%m_%d-%H_%M_%S)
+    LOG_FILE="/logs/$d.txt"
+    CMD="${CMD} --log-file=${LOG_FILE}"
+  fi
+
+  set +e
+  echo "INFO: Starting ${CMD}"
+  eval ${CMD}
+  export RETURN_CODE=$?
+  set -e
+}
 
 set -e
 
@@ -41,63 +57,31 @@ else
   if [ ! -z "$RCLONE_DIR_CHECK_SKIP" ]
   then
     echo "INFO: Skipping source directory check..."
-    if [ ! -z "$OUTPUT_LOG" ]
-    then
-      d=$(date +%Y_%m_%d-%H_%M_%S)
-      LOG_FILE="/logs/$d.txt"
-      echo "INFO: Log file output to $LOG_FILE"
-      echo "INFO: Starting rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
-      set +e
-      eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
-      export RETURN_CODE=$?
-      set -e
-    else
-      echo "INFO: Starting rclone $RCLONE_CMD $SYNC_SRC $SYNC_DEST $RCLONE_OPTS $SYNC_OPTS_ALL"
-      set +e
-      eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
-      export RETURN_CODE=$?
-      set -e
-    fi
+
+    rclone_exec
   else
     set e+
     if test "$(rclone --max-depth $RCLONE_DIR_CMD_DEPTH $RCLONE_DIR_CMD "$(eval echo $SYNC_SRC)" $RCLONE_OPTS)";
     then
       set e-
       echo "INFO: Source directory is not empty and can be processed without clear loss of data"
-      if [ ! -z "$OUTPUT_LOG" ]
-      then
-        d=$(date +%Y_%m_%d-%H_%M_%S)
-        LOG_FILE="/logs/$d.txt"
-        echo "INFO: Log file output to $LOG_FILE"
-        echo "INFO: Starting rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
-        set +e
-        eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL} --log-file=${LOG_FILE}"
-        set -e
-        export RETURN_CODE=$?
-      else
-        echo "INFO: Starting rclone $RCLONE_CMD '$SYNC_SRC' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
-        set +e
-        eval "rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
-        set -e
-        export RETURN_CODE=$?
-      fi
+
+      rclone_exec
     else
       echo "WARNING: Source directory is empty. Skipping $RCLONE_CMD command."
     fi
   fi
 
   # Wrap up healthchecks.io call with complete or failure signal
-  if [ -z "${HEALTHCHECKS_IO_URL}" ]
+  if [ ! -z "${HEALTHCHECKS_IO_URL}" ]
   then
-    echo "INFO: Define HEALTHCHECKS_IO_URL with https://healthchecks.io to monitor $RCLONE_CMD job"
-  else
     if [ "$RETURN_CODE" == 0 ]
     then
       echo "INFO: Sending complete signal to healthchecks.io"
       wget ${HEALTHCHECKS_IO_URL} -O /dev/null
     else
-      echo "INFO: Sending failure signal to healthchecks.io"
-      wget ${HEALTHCHECKS_IO_FAIL_URL:-${HEALTHCHECKS_IO_URL:+${HEALTHCHECKS_IO_URL}/fail}} -O /dev/null
+      echo "WARNING: Sending failure signal to healthchecks.io"
+      wget ${HEALTHCHECKS_IO_URL}/fail -O /dev/null
     fi
   fi
 
