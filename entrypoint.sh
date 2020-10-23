@@ -64,7 +64,7 @@ else
   then
     echo "INFO: Add SYNC_ON_STARTUP=1 to perform a sync upon boot"
   else
-    su "$USER" -c /sync.sh
+    su "$USER" -c /usr/bin/rclone-sync.sh
   fi
 
   # Re-write cron shortcut
@@ -88,12 +88,12 @@ else
   else
     # Setup cron schedule
     crontab -d
-    echo "$CRONS su $USER -c /sync.sh >>/tmp/sync.log 2>&1" > /tmp/crontab.tmp
+    echo "$CRONS su $USER -c /usr/bin/rclone-sync.sh >>/tmp/sync.log 2>&1" > /tmp/crontab.tmp
     if [ -z "$CRON_ABORT" ]
     then
       echo "INFO: Add CRON_ABORT=\"0 6 * * *\" to cancel outstanding sync at 6am"
     else
-      echo "$CRON_ABORT /sync-abort.sh >>/tmp/sync.log 2>&1" >> /tmp/crontab.tmp
+      echo "$CRON_ABORT /usr/bin/rclone-sync-abort.sh >>/tmp/sync.log 2>&1" >> /tmp/crontab.tmp
     fi
     crontab /tmp/crontab.tmp
     rm /tmp/crontab.tmp
