@@ -1,51 +1,52 @@
 #!/bin/sh
 
-rclone_exec() {
-  CMD="rclone $RCLONE_CMD '${SYNC_SRC}' '${SYNC_DEST}' ${RCLONE_OPTS} ${SYNC_OPTS_ALL}"
+healthchecks_io_start() {
+  local url
 
-  if [ ! -z "$LOG_ENABLED" ]
-  then
-    d=$(date +%Y_%m_%d-%H_%M_%S)
-    LOG_FILE="${LOG_DIR}/rclone-$d.log"
-    CMD="${CMD} --log-file=${LOG_FILE}"
-  fi
-
-  echo "INFO: Starting ${CMD}"
-  set +e
-  eval ${CMD}
-  export RETURN_CODE=$?
-  set -e
-}
-
-set -e
-
-SYNC_DEST=/data
-PID_FILE=/var/lib/rclone/rclone-sync.pid
-LOG_DIR=/var/log/rclone
-
-echo "INFO: Starting sync.sh pid $$ $(date)"
-
-if [ `lsof | grep $0 | wc -l | tr -d ' '` -gt 1 ]
-then
-  echo "WARNING: A previous $RCLONE_CMD is still running. Skipping new $RCLONE_CMD command."
-else
-
-  # Signal start oh sync.sh to healthchecks.io
   if [ ! -z "${HEALTHCHECKS_IO_URL}" ]
   then
-    echo "INFO: Sending start signal to healthchecks.io"
-    wget ${HEALTHCHECKS_IO_URL}/start -O /dev/null
-  fi
+    url=${HEALTHCHECKS_IO_URL}/start
+    echo "INFO: Sending helatchecks.io start signal to '${url}'"
 
-  # Delete logs by user request
-  if [ ! -z "${ROTATE_LOG##*[!0-9]*}" ]
+    wget ${url} -O /dev/null
+  fi
+}
+
+healthchecks_io_end() {
+  local return_code=$1
+  local url
+
+  # Wrap up healthchecks.io call with complete or failure signal
+  if [ ! -z "${HEALTHCHECKS_IO_URL}" ]
   then
-    echo "INFO: Removing logs older than $ROTATE_LOG day(s)..."
-    touch ${LOG_DIR}/tmp.log && find ${LOG_DIR}/*.log -mtime +$ROTATE_LOG -type f -delete && rm -f ${LOG_DIR}/tmp.log
+    if [ "${return_code}" == 0 ]
+    then
+      url=${HEALTHCHECKS_IO_URL}
+      echo "INFO: Sending helatchecks.io complete signal to '${url}'"
+    else
+      url=${HEALTHCHECKS_IO_URL}/fail
+      echo "WARNING: Sending helatchecks.io failure signal to '${url}'"
+    fi
+
+    wget ${url} -O /dev/null
   fi
+}
 
-  echo $$ > ${PID_FILE}
+is_rclone_running() {
+  if [ $(lsof | grep $0 | wc -l | tr -d ' ') -gt 1 ]
+  then
+    return 0
+  else
+    return 1
+  fi
+}
 
+is_source_empty() {
+  rclone --max-depth 1 lsf "$(source)" ${rclone_config_file}
+  return $?
+}
+
+get_rclone_cmd_opts() {
   # Evaluate any sync options
   if [ ! -z "$SYNC_OPTS_EVAL" ]
   then
@@ -55,37 +56,72 @@ else
   else
     SYNC_OPTS_ALL="${SYNC_OPTS}"
   fi
+}
 
-  if [ ! -z "$RCLONE_DIR_CHECK_SKIP" ]
+rclone_cmd_exec() {
+  CMD="rclone $RCLONE_CMD '${source}' '${destination}' ${rclone_config_file} ${SYNC_OPTS_ALL}"
+
+  if [ ! -z "$LOG_ENABLED" ]
   then
-    echo "INFO: Skipping source directory check..."
+    d=$(date +%Y_%m_%d-%H_%M_%S)
+    LOG_FILE="${log_dir}/rclone-$d.log"
+    CMD="${CMD} --log-file=${LOG_FILE}"
+  fi
 
-    rclone_exec
+  echo "INFO: Executing: ${CMD}"
+  set +e
+  eval ${CMD}
+  return_code=$?
+  set -e
+
+  return ${return_code}
+}
+
+rotate_logs() {
+  # Delete logs by user request
+  if [ ! -z "${ROTATE_LOG##*[!0-9]*}" ]
+  then
+    echo "INFO: Removing logs older than $ROTATE_LOG day(s)..."
+    touch ${log_dir}/tmp.log && find ${log_dir}/*.log -mtime +$ROTATE_LOG -type f -delete && rm -f ${log_dir}/tmp.log
+  fi
+}
+
+set -e
+
+source=${SYNC_SRC}
+destination=${SYNC_DEST:-/data}
+pid_file=/var/lib/rclone/rclone-sync.pid
+log_dir=/var/log/rclone
+rclone_config_file="--config /etc/rclone/rclone.conf"
+
+echo "INFO: Starting sync.sh pid $$ $(date)"
+
+if is_rclone_running
+then
+  echo "WARNING: A previous rclone instance is still running. Skipping new $RCLONE_CMD command."
+else
+  echo $$ > ${pid_file}
+
+  healthchecks_io_start
+
+  rotate_logs
+
+  rclone_cmd_opts=get_rclone_cmd_opts
+
+  if is_source_empty
+  then
+    echo "WARNING: Source directory is empty. Skipping $RCLONE_CMD command."
+
+    return_code=1
   else
-    set e+
-    if test "$(rclone --max-depth $RCLONE_DIR_CMD_DEPTH $RCLONE_DIR_CMD "$(eval echo $SYNC_SRC)" $RCLONE_OPTS)";
-    then
-      set e-
-      echo "INFO: Source directory is not empty and can be processed without clear loss of data"
+    echo "INFO: Source directory is not empty and can be processed without clear loss of data"
 
-      rclone_exec
-    else
-      echo "WARNING: Source directory is empty. Skipping $RCLONE_CMD command."
-    fi
+    rclone_cmd_exec
+
+    return_code=$?
   fi
 
-  # Wrap up healthchecks.io call with complete or failure signal
-  if [ ! -z "${HEALTHCHECKS_IO_URL}" ]
-  then
-    if [ "$RETURN_CODE" == 0 ]
-    then
-      echo "INFO: Sending complete signal to healthchecks.io"
-      wget ${HEALTHCHECKS_IO_URL} -O /dev/null
-    else
-      echo "WARNING: Sending failure signal to healthchecks.io"
-      wget ${HEALTHCHECKS_IO_URL}/fail -O /dev/null
-    fi
-  fi
+  healthchecks_io_end ${return_code}
 
-  rm -f ${PID_FILE}
+  rm -f ${pid_file}
 fi
