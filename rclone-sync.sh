@@ -66,7 +66,7 @@ get_rclone_cmd_opts() {
 }
 
 rclone_cmd_exec() {
-  CMD="rclone $RCLONE_CMD '${source}' '${destination}' ${rclone_config_file} ${SYNC_OPTS_ALL}"
+  CMD="rclone ${command} '${source}' '${destination}' ${rclone_config_file} ${SYNC_OPTS_ALL}"
 
   if [ ! -z "$LOG_ENABLED" ]
   then
@@ -95,6 +95,7 @@ rotate_logs() {
 
 set -e
 
+command=${ECLONE_COMMAND}
 source=${SYNC_SRC}
 destination=${SYNC_DEST:-/data}
 pid_file=/var/lib/rclone/rclone-sync.pid
@@ -105,7 +106,7 @@ echo "INFO: Starting sync.sh pid $$ $(date)"
 
 if is_rclone_running
 then
-  echo "WARNING: A previous rclone instance is still running. Skipping new $RCLONE_CMD command."
+  echo "WARNING: A previous rclone instance is still running. Skipping new ${command} command."
 else
   echo $$ > ${pid_file}
   echo "INFO: PID file created successfuly: ${pid_file}"
@@ -124,7 +125,7 @@ else
 
     return_code=$?
   else
-    echo "WARNING: Source directory does not exists. Skipping $RCLONE_CMD command."
+    echo "WARNING: Source directory does not exists. Skipping ${command} command."
 
     return_code=1
   fi
