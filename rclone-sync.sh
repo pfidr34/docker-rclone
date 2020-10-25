@@ -41,9 +41,16 @@ is_rclone_running() {
   fi
 }
 
-is_source_empty() {
-  rclone --max-depth 1 lsf "$(source)" ${rclone_config_file}
-  return $?
+is_source_exists() {
+  CMD="rclone --max-depth 1 lsf ${source} ${rclone_config_file}"
+
+  echo "INFO: Executing: ${CMD}"
+  set +e
+  eval ${CMD}
+  return_code=$?
+  set -e
+
+  return ${return_code}
 }
 
 get_rclone_cmd_opts() {
@@ -101,6 +108,7 @@ then
   echo "WARNING: A previous rclone instance is still running. Skipping new $RCLONE_CMD command."
 else
   echo $$ > ${pid_file}
+  echo "INFO: PID file created successfuly: ${pid_file}"
 
   healthchecks_io_start
 
@@ -108,20 +116,21 @@ else
 
   rclone_cmd_opts=get_rclone_cmd_opts
 
-  if is_source_empty
+  if is_source_exists
   then
-    echo "WARNING: Source directory is empty. Skipping $RCLONE_CMD command."
-
-    return_code=1
-  else
     echo "INFO: Source directory is not empty and can be processed without clear loss of data"
 
     rclone_cmd_exec
 
     return_code=$?
+  else
+    echo "WARNING: Source directory does not exists. Skipping $RCLONE_CMD command."
+
+    return_code=1
   fi
 
   healthchecks_io_end ${return_code}
 
+  echo "INFO: Removing PID file"
   rm -f ${pid_file}
 fi

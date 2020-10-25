@@ -79,8 +79,7 @@ else
 
   if [ -z "$CRONS" ]
   then
-    echo "INFO: No CRON setting found. Stopping."
-    echo "INFO: Add CRON=\"0 0 * * *\" to perform sync every midnight"
+	  echo "INFO: No CRON setting found. Stopping. (Tip: Add CRON=\"0 0 * * *\" to perform sync every midnight)"
     exit 1
   else
     # Setup cron schedule
