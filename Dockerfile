@@ -27,7 +27,7 @@ ENV TZ=
 ENV PUID=1000
 ENV PGID=1000
 
-RUN apk --no-cache add ca-certificates fuse wget dcron tzdata
+RUN apk --no-cache add bash ca-certificates dcron fuse tzdata wget
 
 RUN URL=https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip ; \
   URL=${URL/\/current/} ; \
