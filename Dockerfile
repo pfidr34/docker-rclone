@@ -37,6 +37,10 @@ RUN URL=https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-
   && mv /tmp/rclone-*-linux-${ARCH}/rclone* /usr/bin \
   && rm -r /tmp/rclone*
 
+RUN mkdir /etc/rclone
+RUN mkdir /var/lib/rclone
+RUN mkdir /var/log/rclone
+
 COPY entrypoint.sh /
 COPY rclone-sync.sh /usr/bin/
 COPY rclone-sync-abort.sh /usr/bin/
