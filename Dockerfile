@@ -38,8 +38,8 @@ RUN URL=https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-
   && rm -r /tmp/rclone*
 
 RUN mkdir /etc/rclone
-RUN mkdir /var/lib/rclone
-RUN mkdir /var/log/rclone
+RUN mkdir /var/lib/rclone && chown ${PUID}:${PGID} /var/lib/rclone && chmod 775 /var/lib/rclone
+RUN mkdir /var/log/rclone && chown ${PUID}:${PGID} /var/log/rclone && chmod 775 /var/log/rclone
 
 COPY entrypoint.sh /
 COPY rclone-sync.sh /usr/bin/
