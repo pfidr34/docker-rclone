@@ -33,7 +33,7 @@ ENV GID=
 
 RUN apk --no-cache add ca-certificates fuse wget dcron tzdata
 
-RUN URL=http://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip ; \
+RUN URL=https://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip ; \
   URL=${URL/\/current/} ; \
   cd /tmp \
   && wget -q $URL \
