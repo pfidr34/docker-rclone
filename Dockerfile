@@ -3,7 +3,7 @@ FROM ${BASE}
 
 LABEL maintainer="l4t3b0@gmail.com"
 
-ARG RCLONE_VERSION=1.53.1
+ARG RCLONE_VERSION=v1.53.1
 ARG ARCH=amd64
 
 ENV SYNC_SRC=
@@ -38,7 +38,7 @@ RUN URL=http://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-l
   cd /tmp \
   && wget -q $URL \
   && unzip /tmp/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip \
-  && mv /tmp/rclone-*-linux-${ARCH}/rclone /usr/bin \
+  && mv /tmp/rclone-*-linux-${ARCH}/rclone* /usr/bin \
   && rm -r /tmp/rclone*
 
 COPY entrypoint.sh /
