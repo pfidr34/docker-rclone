@@ -55,7 +55,7 @@ is_source_exists() {
 
 get_rclone_cmd_opts() {
   # Evaluate any sync options
-  if [ ! -z "$SYNC_OPTS_EVAL" ]
+  if [ ! -z "${SYNC_OPTS_EVAL}" ]
   then
     SYNC_OPTS_EVALUALTED=$(eval echo $SYNC_OPTS_EVAL)
     echo "INFO: Evaluated SYNC_OPTS_EVAL to: ${SYNC_OPTS_EVALUALTED}"

@@ -11,7 +11,7 @@ if [[ ! ${RCLONE_CMD} =~ (copy|move|sync) ]]; then
 elif [ -z "${PGID}" -a ! -z "${PUID}" ] || [ -z "${PUID}" -a ! -z "${PGID}" ]; then
   echo "WARNING: Must supply both PUID and PGID or neither. Stopping."
   exit 1
-elif [ ! -z "$TZ" -a ! -f /usr/share/zoneinfo/$TZ ]; then
+elif [ ! -z "${TZ}" -a ! -f /usr/share/zoneinfo/${TZ} ]; then
   echo "WARNING: TZ was set '${TZ}', but corresponding zoneinfo file does not exist. Stopping."
   exit 1
 fi
@@ -43,10 +43,10 @@ else
 fi
 
 # Set time zone if passed in
-if [ ! -z "$TZ" ]
+if [ ! -z "${TZ}" ]
 then
-  cp /usr/share/zoneinfo/$TZ /etc/localtime
-  echo $TZ > /etc/timezone
+  cp /usr/share/zoneinfo/${TZ} /etc/localtime
+  echo ${TZ} > /etc/timezone
 fi
 
 rm -f /tmp/sync.pid
