@@ -95,7 +95,7 @@ rotate_logs() {
 
 set -e
 
-command=${ECLONE_COMMAND}
+command=${RCLONE_CMD}
 source=${SYNC_SRC}
 destination=${SYNC_DEST:-/data}
 pid_file=/var/lib/rclone/rclone-sync.pid

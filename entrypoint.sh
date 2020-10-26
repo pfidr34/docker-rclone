@@ -8,25 +8,25 @@ echo "INFO: Running $(rclone --version | head -n 1)"
 if [[ ! ${RCLONE_CMD} =~ (copy|move|sync) ]]; then
   echo "WARNING: rclone command '${RCLONE_CMD}' is not supported by this container, please use sync/copy/move. Stopping."
   exit 1
-elif [ -z "$GID" -a ! -z "$UID" ] || [ -z "$UID" -a ! -z "$GID" ]; then
-  echo "WARNING: Must supply both UID and GID or neither. Stopping."
+elif [ -z "${PGID}" -a ! -z "${PUID}" ] || [ -z "${PUID}" -a ! -z "${PGID}" ]; then
+  echo "WARNING: Must supply both PUID and PGID or neither. Stopping."
   exit 1
 elif [ ! -z "$TZ" -a ! -f /usr/share/zoneinfo/$TZ ]; then
   echo "WARNING: TZ was set '${TZ}', but corresponding zoneinfo file does not exist. Stopping."
   exit 1
 fi
 
-if [ -z "$UID" ]
+if [ -z "${PUID}" ]
 then
   USER=$(whoami)
 else
-  USER=$(getent passwd "$UID" | cut -d: -f1)
-  GROUP=$(getent group "$GID" | cut -d: -f1)
+  USER=$(getent passwd "${PUID}" | cut -d: -f1)
+  GROUP=$(getent group "${PGID}" | cut -d: -f1)
 
   if [ -z "$GROUP" ]
   then
     GROUP=rclone
-    addgroup --gid "$GID" "$GROUP"
+    addgroup --gid "${PGID}" "$GROUP"
   fi
 
   if [ -z "$USER" ]
@@ -37,7 +37,7 @@ else
       --gecos "" \
       --no-create-home \
       --ingroup "$GROUP" \
-      --uid "$UID" \
+      --uid "${PUID}" \
       "$USER" > /dev/null
   fi
 fi
