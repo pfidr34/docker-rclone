@@ -16,7 +16,7 @@ ENV RCLONE_CMD=sync
 ENV RCLONE_CONFIG="--config /etc/rclone/rclone.conf"
 
 ENV LOG_ENABLED=
-ENV ROTATE_LOG=
+ENV LOG_ROTATE=
 
 ENV CRON=
 ENV CRON_ABORT=
@@ -24,8 +24,8 @@ ENV CRON_ABORT=
 ENV HEALTHCHECKS_IO_URL=
 
 ENV TZ=
-ENV PUID=1000
-ENV PGID=1000
+ENV PUID=0
+ENV PGID=0
 
 RUN apk --no-cache add bash ca-certificates dcron fuse tzdata wget
 

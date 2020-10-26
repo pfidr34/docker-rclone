@@ -79,17 +79,17 @@ else
 
   if [ -z "$CRONS" ]
   then
-	  echo "INFO: No CRON setting found. Stopping. (Tip: Add CRON=\"0 0 * * *\" to perform sync every midnight)"
+    echo "INFO: No CRON setting found. Stopping. (Tip: Add CRON=\"0 0 * * *\" to perform sync every midnight)"
     exit 1
   else
     # Setup cron schedule
     crontab -d
-    echo "$CRONS su $USER -c /usr/bin/rclone-sync.sh >>/tmp/sync.log 2>&1" > /tmp/crontab.tmp
+    echo "$CRONS su $USER -c /usr/bin/rclone-sync.sh >> /var/log/rclone/rclone-sync.crontab.log 2>&1" > /tmp/crontab.tmp
     if [ -z "$CRON_ABORT" ]
     then
       echo "INFO: Add CRON_ABORT=\"0 6 * * *\" to cancel outstanding sync at 6am"
     else
-      echo "$CRON_ABORT /usr/bin/rclone-sync-abort.sh >>/tmp/sync.log 2>&1" >> /tmp/crontab.tmp
+      echo "$CRON_ABORT /usr/bin/rclone-sync-abort.sh >> /var/log/rclone/rclone-sync.crontab.log 2>&1" >> /tmp/crontab.tmp
     fi
     crontab /tmp/crontab.tmp
     rm /tmp/crontab.tmp

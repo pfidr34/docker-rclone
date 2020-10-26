@@ -41,14 +41,21 @@ is_rclone_running() {
   fi
 }
 
-is_source_exists() {
-  CMD="rclone --max-depth 1 lsf ${source} ${rclone_config_file}"
+is_remote_exists() {
+  local remote=$1
 
-  echo "INFO: Executing: ${CMD}"
-  set +e
-  eval ${CMD}
-  return_code=$?
-  set -e
+  if [ -z "${remote}" ]
+  then
+    return_code=1
+  else
+    CMD="rclone --max-depth 1 lsf ${remote} ${rclone_config_file}"
+
+    echo "INFO: Executing: ${CMD}"
+    set +e
+    eval ${CMD}
+    return_code=$?
+    set -e
+  fi
 
   return ${return_code}
 }
@@ -86,10 +93,10 @@ rclone_cmd_exec() {
 
 rotate_logs() {
   # Delete logs by user request
-  if [ ! -z "${ROTATE_LOG##*[!0-9]*}" ]
+  if [ ! -z "${LOG_ROTATE##*[!0-9]*}" ]
   then
-    echo "INFO: Removing logs older than $ROTATE_LOG day(s)..."
-    touch ${log_dir}/tmp.log && find ${log_dir}/*.log -mtime +$ROTATE_LOG -type f -delete && rm -f ${log_dir}/tmp.log
+    echo "INFO: Removing logs older than ${LOG_ROTATE} day(s)..."
+    touch ${log_dir}/tmp.log && find ${log_dir}/*.log -mtime +${LOG_ROTATE} -type f -delete && rm -f ${log_dir}/tmp.log
   fi
 }
 
@@ -117,7 +124,7 @@ else
 
   rclone_cmd_opts=get_rclone_cmd_opts
 
-  if is_source_exists
+  if is_remote_exists ${source}
   then
     echo "INFO: Source directory is not empty and can be processed without clear loss of data"
 
@@ -125,7 +132,7 @@ else
 
     return_code=$?
   else
-    echo "WARNING: Source directory does not exists. Skipping ${command} command."
+    echo "WARNING: Source directory \"${sorce}\" does not exists. Skipping ${command} command."
 
     return_code=1
   fi
