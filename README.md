@@ -65,56 +65,7 @@ See [rclone sync docs](https://rclone.org/commands/rclone_sync/) for source/dest
 
 ## Changelog
 
-+ **06/11/2020:**
-  * Update to latest Rclone (v1.52.1)
-+ **05/28/2020:**
-  * Eval the entire rclone command
-  * Modify how rclone errors are interpreted when checking if source directory is empty
-+ **05/27/2020:**
-  * Update to latest Rclone (v1.52.0)
-  * Add `RCLONE_DIR_CMD_DEPTH` option to declare recursion depth when checking if `SYNC_SRC` is empty
-  * Move call to signal start of healthchecks.io further up in the sync process
-  * Change when logs are deleted to make sure an active log is not deleted
-+ **05/18/2020:**
-  * Modify how rclone errors are interpreted when passing results to healthchecks.io
-+ **05/17/2020:**
-  * Handle spaces in `SYNC_SRC` and `SYNC_DEST`
-+ **02/01/2020:**
-  * Update to latest Rclone (v1.51.0)
-+ **11/20/2019:**
-  * Update to latest Rclone (v1.50.2)
-+ **11/18/2019:**
-  * Add support for UID/GID
-+ **11/06/2019:**
-  * Update to latest Rclone (v1.50.1)
-+ **10/27/2019:**
-  * Update to latest Rclone (v1.50.0)
-+ **10/07/2019:**
-  * Update to latest Rclone (v1.49.5)
-+ **10/01/2019:**
-  * Update to latest Rclone (v1.49.4)
-+ **09/23/2019:**
-  * Add environment variable SYNC_ONCE
-+ **09/19/2019:**
-  * Add environment variable SYNC_OPTS_EVAL
-+ **09/17/2019:**
-  * Update to latest Rclone (v1.49.3)
-+ **09/10/2019:**
-  * Regression on log rotation 
-+ **09/09/2019:**
-  * Update to latest Rclone (v1.49.2)
-+ **08/29/2019:**
-  * Update to latest Rclone (v1.49.1)
-+ **08/20/2019:**
-  * Add start command for healthchecks.io calls
-  * Add debug messages for healthchecks.io calls
-+ **08/19/2019:**
-  * Correct log rotation when there are no logs
-+ **07/18/2019:**
-  * Optimizations to dockerfile
-+ **06/22/2019:**
-  * Update to latest Rclone (v1.48.0)
-+ **05/01/2019:**
++ **10/28/2020:**
   * Initial release
 
 <br />
@@ -122,3 +73,4 @@ See [rclone sync docs](https://rclone.org/commands/rclone_sync/) for source/dest
 <br />
 <br />
 Credit to Brian J. Cardiff for the orginal project @ https://github.com/bcardiff/docker-rclone
+Credit to pfidr for the orginal project @ https://github.com/pfidr/docker-rclone
