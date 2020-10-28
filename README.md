@@ -43,26 +43,22 @@ A few environment variables allow you to customize the behavior of rclone:
 * `SYNC_DEST` destination location for `rclone sync/copy/move` command. Directories with spaces should be wrapped in single quotes.
 * `SYNC_OPTS` additional options for `rclone sync/copy/move` command. Defaults to `-v`
 * `SYNC_OPTS_EVAL` further additional options for `rclone sync/copy/move` command. The variables and commands in the string are first interpolated like in a shell. The interpolated string is appended to SYNC_OPTS. That means '--backup-dir /old\`date -I\`' first evaluates to '--backup-dir /old2019-09-12', which is then appended to SYNC_OPTS. The evaluation happens immediately before rclone is called.
-* `SYNC_ONCE` set variable to only run the sync one time and then exit the container
 * `RCLONE_CMD` set variable to `sync` `copy` or `move`  when running rclone. Defaults to `sync`
 * `RCLONE_DIR_CMD` set variable to `ls` or `lsf` for source directory check style. Defaults to `ls`
-* `RCLONE_DIR_CMD_DEPTH` set the limit of the recursion depth to this. Defaults to `-1` (rclone default)
-* `RCLONE_DIR_CHECK_SKIP` set variable to skip source directory check before sync. *Use with caution*
 * `CRON` crontab schedule `0 0 * * *` to perform sync every midnight. Also supprorts cron shortcuts: `@yearly` `@monthly` `@weekly` `@daily` `@hourly`
 * `CRON_ABORT` crontab schedule `0 6 * * *` to abort sync at 6am
-* `FORCE_SYNC` set variable to perform a sync upon boot
-* `CHECK_URL` [healthchecks.io](https://healthchecks.io) url or similar cron monitoring to perform a `GET` after a successful sync
-* `FAIL_URL` Fail URL to perform a `GET` after unsuccessful execution. By default this is `CHECK_URL` with appended "/fail" at the end
-* `OUTPUT_LOG` set variable to output log file to /logs
-* `ROTATE_LOG` set variable to delete logs older than specified days from /logs
+* `SYNC_ON_STARTUP` set variable to perform a sync upon boot
+* `HEALTHCHECKS_IO_URL` [healthchecks.io](https://healthchecks.io) url or similar cron monitoring to perform a `GET` after a successful sync
+* `LOG_ENABLE` set variable to output log file to /var/log/rclone
+* `LOG_ROTATE` set variable to delete logs older than specified days from /var/log/rclone
 * `TZ` set the [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) to use for the cron and log `America/Chicago`
-* `UID` set variable to specify user to run rclone as. Must also use GID.
-* `GID` set variable to specify group to run rclone as. Must also use UID.
+* `PUID` set variable to specify user to run rclone as. Must also use GID.
+* `PGID` set variable to specify group to run rclone as. Must also use UID.
 
-**When using UID/GID the config and/or logs directory must be writeable by this UID**
+**When using PUID/PGID the config and/or logs directory must be writeable by this UID**
 
 ```bash
-$ docker run --rm -it -v $(pwd)/config:/config -v /path/to/source:/source -e SYNC_SRC="/source" -e SYNC_DEST="dest:path" -e TZ="America/Chicago" -e CRON="0 0 * * *" -e CRON_ABORT="0 6 * * *" -e FORCE_SYNC=1 -e CHECK_URL=https://hchk.io/hchk_uuid pfidr/rclone
+$ docker run --rm -it -v $(pwd)/config:/etc/rclone -v /path/to/destination:/data -e SYNC_SRC="onedrive:/" -e SYNC_DEST="/data" -e TZ="Europe/Budapest" -e CRON="0 0 * * *" -e CRON_ABORT="0 6 * * *" -e SYNC_ON_STARTUP=1 -e HEALTHCHECKS_IO_URL=https://hchk.io/hchk_uuid l4t3b0/rclone
 ```
 
 See [rclone sync docs](https://rclone.org/commands/rclone_sync/) for source/dest syntax and additional options.
