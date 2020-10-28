@@ -26,13 +26,13 @@ rclone is a command line program to sync files and directories to and from:
 rclone needs a configuration file where credentials to access different storage
 provider are kept.
 
-By default, this image uses a file `/config/rclone.conf` and a mounted volume may be used to keep that information persisted.
+By default, this image uses a file `/etc/rclone.conf` and a mounted volume may be used to keep that information persisted.
 
 A first run of the container can help in the creation of the file, but feel free to manually create one.
 
 ```
 $ mkdir config
-$ docker run --rm -it -v $(pwd)/config:/config pfidr/rclone
+$ docker run --rm -it -v $(pwd)/config:/etc/rclone l4t3b0/rclone
 ```
 
 ### Perform sync in a daily basis
