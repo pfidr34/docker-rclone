@@ -79,7 +79,7 @@ rclone_cmd_exec() {
   then
     d=$(date +%Y_%m_%d-%H_%M_%S)
     LOG_FILE="${log_dir}/rclone-$d.log"
-    CMD="${CMD} --log-file=${LOG_FILE}"
+    CMD="${CMD} --log-file=${LOG_FILE} --log-level INFO"
   fi
 
   echo "INFO: Executing: ${CMD}"
