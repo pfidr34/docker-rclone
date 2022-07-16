@@ -14,6 +14,7 @@ rclone is a command line program to sync files and directories to and from:
 * Hubic
 * Backblaze B2
 * Yandex Disk
+* Cloudflare R2
 * SFTP
 * FTP
 * HTTP
@@ -70,6 +71,8 @@ See [rclone sync docs](https://rclone.org/commands/rclone_sync/) for source/dest
 
 ## Changelog
 
++ **07/16/2022:**
+  * Update to latest Rclone (v1.59.0)
 + **04/25/2022:**
   * Display exit code in console output
   * Fix issue with healthcheck
