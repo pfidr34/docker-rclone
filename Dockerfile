@@ -1,10 +1,18 @@
-ARG BASE=alpine:latest
-FROM ${BASE}
+FROM golang AS builder
 
-LABEL maintainer="pfidr"
+WORKDIR /
+RUN git clone https://github.com/rclone/rclone.git \
+	&& cd rclone \
+	&& CGO_ENABLED=0 \
+	make
 
-ARG RCLONE_VERSION=current
-ARG ARCH=amd64
+RUN /rclone/rclone version
+
+FROM alpine
+
+LABEL maintainer="iskoldt-X"
+
+
 ENV SYNC_SRC=
 ENV SYNC_DEST=
 ENV SYNC_OPTS=-v
@@ -29,13 +37,7 @@ ENV GID=
 
 RUN apk --no-cache add ca-certificates fuse wget dcron tzdata
 
-RUN URL=http://downloads.rclone.org/${RCLONE_VERSION}/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip ; \
-  URL=${URL/\/current/} ; \
-  cd /tmp \
-  && wget -q $URL \
-  && unzip /tmp/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip \
-  && mv /tmp/rclone-*-linux-${ARCH}/rclone /usr/bin \
-  && rm -r /tmp/rclone*
+COPY --from=builder /rclone/rclone /usr/bin/
 
 COPY entrypoint.sh /
 COPY sync.sh /
