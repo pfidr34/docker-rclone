@@ -1,17 +1,13 @@
 FROM golang AS builder
 
 WORKDIR /
-RUN git clone https://github.com/rclone/rclone.git \
-	&& cd rclone \
-	&& CGO_ENABLED=0 \
-	make
-
+RUN git clone https://github.com/rclone/rclone.git
+RUN cd rclone
+RUN CGO_ENABLED=0 make
 RUN /rclone/rclone version
 
 FROM alpine
-
 LABEL maintainer="iskoldt-X"
-
 
 ENV SYNC_SRC=
 ENV SYNC_DEST=
