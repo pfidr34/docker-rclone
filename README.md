@@ -2,6 +2,10 @@
 
 Docker image to perform a [rclone](http://rclone.org) sync based on a cron schedule, with [healthchecks.io](https://healthchecks.io) monitoring.
 
+Forked from [pfidr34/docker-rclone](https://github.com/pfidr34/docker-rclone)
+
+You can find the Dockerhub repository here  [iskoldt/rclone](https://hub.docker.com/repository/docker/iskoldt/rclone)
+
 rclone is a command line program to sync files and directories to and from:
 
 * Google Drive
@@ -32,7 +36,7 @@ A first run of the container can help in the creation of the file, but feel free
 
 ```
 $ mkdir config
-$ docker run --rm -it -v $(pwd)/config:/config pfidr/rclone
+$ docker run --rm -it -v $(pwd)/config:/config iskoldt/rclone
 ```
 
 ### Perform sync in a daily basis
@@ -63,13 +67,15 @@ A few environment variables allow you to customize the behavior of rclone:
 **When using UID/GID the config and/or logs directory must be writeable by this UID**
 
 ```bash
-$ docker run --rm -it -v $(pwd)/config:/config -v /path/to/source:/source -e SYNC_SRC="/source" -e SYNC_DEST="dest:path" -e TZ="America/Chicago" -e CRON="0 0 * * *" -e CRON_ABORT="0 6 * * *" -e FORCE_SYNC=1 -e CHECK_URL=https://hchk.io/hchk_uuid pfidr/rclone
+$ docker run --rm -it -v $(pwd)/config:/config -v /path/to/source:/source -e SYNC_SRC="/source" -e SYNC_DEST="dest:path" -e TZ="America/Chicago" -e CRON="0 0 * * *" -e CRON_ABORT="0 6 * * *" -e FORCE_SYNC=1 -e CHECK_URL=https://hchk.io/hchk_uuid iskoldt/rclone
 ```
 
 See [rclone sync docs](https://rclone.org/commands/rclone_sync/) for source/dest syntax and additional options.
 
 ## Changelog
 
++ **08/03/2022:**
+  * Update to compile Rclone from source
 + **07/18/2022:**
   * Update to latest Rclone (v1.59.0)
 + **04/25/2022:**
