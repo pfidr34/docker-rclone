@@ -32,7 +32,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.SAVEBOT_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
       -
         name: Owner names
         run: |
