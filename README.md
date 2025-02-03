@@ -68,7 +68,7 @@ A few environment variables allow you to customize the behavior of rclone:
 **When using UID/GID the config and/or logs directory must be writeable by this UID**
 
 ```bash
-$ docker run --rm -it -v $(pwd)/config:/config -v /path/to/source:/source -e SYNC_SRC="/source" -e SYNC_DEST="dest:path" -e TZ="America/Chicago" -e CRON="0 0 * * *" -e CRON_ABORT="0 6 * * *" -e FORCE_SYNC=1 -e CHECK_URL=https://hchk.io/hchk_uuid iskoldt/rclone
+$ docker run -d -v $(pwd)/config:/config  --name iskold -v /path/to/source:/source -e SYNC_SRC="/source" -e SYNC_DEST="dest:path" -e TZ="Asia/Shanghai" -e CRON="0 0 * * *" -e CRON_ABORT="0 6 * * *" -e FORCE_SYNC=1 -e CHECK_URL=https://hchk.io/hchk_uuid iskoldt/rclone
 ```
 
 See [rclone sync docs](https://rclone.org/commands/rclone_sync/) for source/dest syntax and additional options.
